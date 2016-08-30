@@ -29,7 +29,7 @@ public class MyBehaviorActivity extends AppCompatActivity {
     private GridAdapter mAdapter;
     private List<Meizi> meizis;
     private StaggeredGridLayoutManager mLayoutManager;
-    private int lastVisibleItem ;
+    private int lastVisibleItem ;//recyclerview最后显示的Item,用于判断recyclerview自动加载下一页
     private int page=1;
     private SwipeRefreshLayout swipeRefreshLayout;
     private FloatingActionButton fab;
@@ -40,7 +40,7 @@ public class MyBehaviorActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_behavior_demo);
 
-        StatusBarUtil.setStatusBarColor(MyBehaviorActivity.this,R.color.colorPrimaryDark);
+        StatusBarUtil.setStatusBarColor(MyBehaviorActivity.this,R.color.colorPrimaryDark);//设置状态栏颜色
 
         initView();
         setListener();
@@ -60,7 +60,7 @@ public class MyBehaviorActivity extends AppCompatActivity {
         recyclerview.setLayoutManager(mLayoutManager);
 
         swipeRefreshLayout=(SwipeRefreshLayout) findViewById(R.id.behavior_demo_swipe_refresh) ;
-        swipeRefreshLayout.setProgressViewOffset(false, 0,  (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
+        swipeRefreshLayout.setProgressViewOffset(false, 0,  (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));//调整下拉控件位置
 
         fab=(FloatingActionButton) findViewById(R.id.fab);
     }

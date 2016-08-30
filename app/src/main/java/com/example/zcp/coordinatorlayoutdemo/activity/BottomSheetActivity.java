@@ -35,16 +35,20 @@ public class BottomSheetActivity extends AppCompatActivity implements GridAdapte
 
     private static RecyclerView recyclerview;
     private CoordinatorLayout coordinatorLayout;
-    private GridAdapter mAdapter;
+    private GridAdapter mAdapter;//recyclerView适配器
     private List<Meizi> meizis;
     private StaggeredGridLayoutManager mLayoutManager;
-    private int lastVisibleItem ;
+    private int lastVisibleItem ;//recyclerview最后显示的Item,用于判断recyclerview自动加载下一页
     private int page=1;
     private SwipeRefreshLayout swipeRefreshLayout;
     private RelativeLayout design_bottom_sheet,design_bottom_sheet_bar;
     private  BottomSheetBehavior behavior;
     private ImageView bottom_sheet_iv;
     private TextView bottom_sheet_tv;
+
+    /**
+     * 标识初始化时是否修改了底栏高度
+     */
     private boolean isSetBottomSheetHeight;
 
     @Override
@@ -57,7 +61,7 @@ public class BottomSheetActivity extends AppCompatActivity implements GridAdapte
         initView();
         setListener();
 
-        new GetData().execute("http://gank.io/api/data/福利/10/1");
+        new GetData().execute("http://gank.io/api/data/福利/10/1");//初始化数据
 
     }
 
@@ -72,7 +76,7 @@ public class BottomSheetActivity extends AppCompatActivity implements GridAdapte
         recyclerview.setLayoutManager(mLayoutManager);
 
         swipeRefreshLayout=(SwipeRefreshLayout) findViewById(R.id.bottom_sheet_demo_swipe_refresh) ;
-        swipeRefreshLayout.setProgressViewOffset(false, 0,  (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
+        swipeRefreshLayout.setProgressViewOffset(false, 0,  (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));//调整下拉控件位置
 
         design_bottom_sheet_bar=(RelativeLayout) findViewById(R.id.design_bottom_sheet_bar);
 
@@ -100,24 +104,25 @@ public class BottomSheetActivity extends AppCompatActivity implements GridAdapte
 
     private void setListener(){
 
+        //底栏状态改变的监听
         behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 if(newState!=BottomSheetBehavior.STATE_COLLAPSED&&bottom_sheet_tv.getVisibility()==View.VISIBLE){
                     bottom_sheet_tv.setVisibility(View.GONE);
                     bottom_sheet_iv.setVisibility(View.VISIBLE);
-                    mAdapter.setOnItemClickListener(null);//展开状态下屏蔽RecyclerView item的点击
+                    mAdapter.setOnItemClickListener(null);//底栏展开状态下屏蔽RecyclerView item的点击
                 }else if(newState==BottomSheetBehavior.STATE_COLLAPSED&&bottom_sheet_tv.getVisibility()==View.GONE){
                     bottom_sheet_tv.setVisibility(View.VISIBLE);
                     bottom_sheet_iv.setVisibility(View.GONE);
-                    mAdapter.setOnItemClickListener(BottomSheetActivity.this);
+                    mAdapter.setOnItemClickListener(BottomSheetActivity.this);//底栏折叠状态下恢复RecyclerView item的点击
                 }
             }
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
 
                 if(bottomSheet.getTop()<2*design_bottom_sheet_bar.getHeight()){
+                    //设置底栏完全展开时，出现的顶部工具栏的动画
                     design_bottom_sheet_bar.setVisibility(View.VISIBLE);
                     design_bottom_sheet_bar.setAlpha(slideOffset);
                     design_bottom_sheet_bar.setTranslationY(bottomSheet.getTop()-2*design_bottom_sheet_bar.getHeight());
@@ -132,7 +137,7 @@ public class BottomSheetActivity extends AppCompatActivity implements GridAdapte
             @Override
             public void onClick(View v) {
 
-                behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);//点击顶部工具栏 将底栏变为折叠状态
             }
         });
 
@@ -144,6 +149,7 @@ public class BottomSheetActivity extends AppCompatActivity implements GridAdapte
             }
         });
 
+        //recyclerView滑动监听
         recyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -154,7 +160,7 @@ public class BottomSheetActivity extends AppCompatActivity implements GridAdapte
                     behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
 
-//                0：当前屏幕停止滚动；1时：屏幕在滚动 且 用户仍在触碰或手指还在屏幕上；2时：随用户的操作，屏幕上产生的惯性滑动；
+                //0：当前屏幕停止滚动；1时：屏幕在滚动 且 用户仍在触碰或手指还在屏幕上；2时：随用户的操作，屏幕上产生的惯性滑动；
                 //用来判断recyclerview自动加载
                 if (newState == RecyclerView.SCROLL_STATE_IDLE
                         && lastVisibleItem +2>=mLayoutManager.getItemCount()) {
